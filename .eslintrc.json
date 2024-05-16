@@ -5,10 +5,7 @@
     "es6": true
   },
   "parser": "@typescript-eslint/parser",
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "plugins": ["@typescript-eslint"],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -36,5 +33,8 @@
   ]
 }
 
-
+// "extends": [
+//     "eslint:recommended",
+//     "plugin:@typescript-eslint/recommended"
+//   ],
 
