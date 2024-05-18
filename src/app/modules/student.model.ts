@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import validator from 'validator';
 import {
   Guardian,
   LocalGuardian,
@@ -12,9 +13,23 @@ const userNameSchema = new Schema<UserName>({
     required: [true, 'First Name is required'],
     trim: true,
     maxlength: [20, 'First Name can not be more than 20 characters'],
+    // validate: {
+    //   validator: function (value: string) {
+    //     const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
+    //     return firstNameStr === value;
+    //   },
+    //   message: '{VALUE} is not in capitalized format',
+    // },
   },
   middleName: { type: String },
-  lastName: { type: String, required: [true, 'Last Name is required'] },
+  lastName: {
+    type: String,
+    required: [true, 'Last Name is required'],
+    // validate: {
+    //   validator: (value: string) => validator.isAlpha(value),
+    //   message: '{VALUE} is not a valid',
+    // },
+  },
 });
 
 const guardianSchema = new Schema<Guardian>({
@@ -48,7 +63,16 @@ const studentSchema = new Schema<Student>({
     required: true,
   },
   dateOfBirth: String,
-  email: { type: String, required: true, unique: true, trim: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    validate: {
+      validator: (value: string) => validator.isEmail(value),
+      message: '{VALUE} is not valid',
+    },
+  },
   contactNo: { type: String, required: true },
   emergencyContactNo: { type: String, required: true },
   bloodGroup: {
@@ -68,7 +92,7 @@ const studentSchema = new Schema<Student>({
   profileImg: { type: String },
   isActive: {
     type: String,
-    enum: ['active', 'inActive'],
+    enum: ['active', 'blocked'],
     default: 'active',
   },
 });
