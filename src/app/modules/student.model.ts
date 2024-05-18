@@ -21,7 +21,6 @@ const userNameSchema = new Schema<UserName>({
     //   message: '{VALUE} is not in capitalized format',
     // },
   },
-<<<<<<< HEAD
   middleName: { type: String },
   lastName: {
     type: String,
@@ -31,10 +30,6 @@ const userNameSchema = new Schema<UserName>({
     //   message: '{VALUE} is not a valid',
     // },
   },
-=======
-  middleName: { type: String, trim: true },
-  lastName: { type: String, required: [true, 'Last Name is required'] },
->>>>>>> a7f35358f16d7f7a783ce3be36ec4a2053f5eb1f
 });
 
 const guardianSchema = new Schema<Guardian>({
