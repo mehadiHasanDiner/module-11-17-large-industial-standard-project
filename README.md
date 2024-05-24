@@ -1,1 +1,1 @@
-# module-8-first-project
+# module-11-17-large-industial-standard-project
