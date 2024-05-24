@@ -1,4 +1,3 @@
-import { StudentModel } from './student.interface';
 import { Model } from 'mongoose';
 
 export type TGuardian = {
@@ -25,6 +24,7 @@ export type TLocalGuardian = {
 
 export type TStudent = {
   id: string;
+  password: string;
   name: TUserName;
   gender: 'male' | 'female' | 'other';
   dateOfBirth?: string;
@@ -38,6 +38,7 @@ export type TStudent = {
   localGuardian: TLocalGuardian;
   profileImg?: string;
   isActive: 'active' | 'blocked';
+  isDeleted: boolean;
 };
 
 // for creating static
@@ -48,7 +49,7 @@ export interface StudentModel extends Model<TStudent> {
 // for creating instance
 
 // export interface StudentMethods {
-//   isUserExits(id: string): Promise<TStudent|null>;
+//   isUserExists(id: string): Promise<TStudent|null>;
 // };
 
 // export type StudentModel = Model<
