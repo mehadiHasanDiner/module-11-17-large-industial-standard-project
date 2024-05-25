@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 
 const createStudent = async (req: Request, res: Response) => {
@@ -16,6 +17,7 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'student is created successfully',
       data: result,
     });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -24,3 +26,8 @@ const createStudent = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const UserController ={
+  createStudent,
+
+}
