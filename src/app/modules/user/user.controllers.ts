@@ -1,33 +1,34 @@
-import { Request, Response } from 'express';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
+import { NextFunction, Request, Response } from 'express';
 import { UserServices } from './user.service';
+import sendResponse from '../../utils/sendResponse';
 
-const createStudent = async (req: Request, res: Response) => {
+const createStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     // creating a schema for validation using zod
-
     const { password, student: studentData } = req.body;
 
     const result = await UserServices.createStudentIntoDB(
       password,
       studentData,
     );
-
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: 'student is created successfully',
       data: result,
     });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'something went wrong',
-      data: error,
-    });
+    next(error);
+    // গ্লোবাল ইরর হ্যান্ডালার next() নামক গাড়ি করে controller থেকে ‍ৃ app.ts এ চলে গেছে।
   }
 };
 
-export const UserController ={
+export const UserController = {
   createStudent,
-
-}
+};
