@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import { RequestHandler } from 'express';
 import { UserServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
+import catchAsync from '../../utils/catchAsync';
 
-const createStudent: RequestHandler = async (req, res, next) => {
+const createStudent = catchAsync(async (req, res, next) => {
   try {
     // creating a schema for validation using zod
     const { password, student: studentData } = req.body;
@@ -23,7 +23,7 @@ const createStudent: RequestHandler = async (req, res, next) => {
     next(error);
     // গ্লোবাল ইরর হ্যান্ডালার next() নামক গাড়ি করে controller থেকে ‍ৃ app.ts এ চলে গেছে।
   }
-};
+});
 
 export const UserController = {
   createStudent,
