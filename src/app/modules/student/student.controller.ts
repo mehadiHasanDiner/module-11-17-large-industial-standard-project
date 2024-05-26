@@ -1,14 +1,10 @@
 import httpStatus from 'http-status';
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { StudentServices } from './student.service';
 import sendResponse from '../../utils/sendResponse';
 
-const getAllStudents = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const getAllStudents: RequestHandler = async (req, res, next) => {
   try {
     const result = await StudentServices.getAllStudentsFromDB();
     sendResponse(res, {
@@ -22,11 +18,7 @@ const getAllStudents = async (
   }
 };
 
-const getSingleStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const getSingleStudent: RequestHandler = async (req, res, next) => {
   try {
     const { studentId } = req.params;
     const result = await StudentServices.getSingleStudentsFromDB(studentId);
@@ -41,14 +33,10 @@ const getSingleStudent = async (
   }
 };
 
-const deleteStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const deleteStudent: RequestHandler = async (req, res, next) => {
   try {
     const { studentId } = req.params;
-    
+
     const result = await StudentServices.deleteStudentsFromDB(studentId);
     sendResponse(res, {
       statusCode: httpStatus.OK,
