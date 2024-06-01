@@ -8,6 +8,9 @@ import {
   TStudent,
   TUserName,
 } from './student.interface';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
+import { User } from '../user/user.model';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -111,6 +114,18 @@ studentSchema.virtual('fullName').get(function () {
   );
 });
 
+
+// handling update operation when result is null
+// studentSchema.pre('findOneAndUpdate', async function (next) {
+//   const query = this.getQuery();
+//   const isStudentExist = await Student.findOne({ query });
+//   const isUserExist = await User.findOne({ query });
+//   if (!isStudentExist && isUserExist) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'This Department does not exist');
+//   }
+//   next();
+// });
+
 studentSchema.pre('findOne', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -120,6 +135,7 @@ studentSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
+
 
 // creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
