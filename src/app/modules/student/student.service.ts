@@ -37,8 +37,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
       },
     });
 
-
-    //sorting function
+  //sorting function
 
   let sort = '-createdAt';
 
@@ -49,11 +48,10 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const sortQuery = await filterQuery.sort(sort);
 
   let limit = 1;
-  if(query.limit) {
-    limit = query.limit ;
+  if (query.limit) {
+    limit = query.limit;
   }
   const limitQuery = await sortQuery.limit(limit);
-
 
   return limitQuery;
 };
