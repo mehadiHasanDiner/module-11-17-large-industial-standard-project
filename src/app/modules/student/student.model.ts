@@ -105,15 +105,14 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 // virtual
 studentSchema.virtual('fullName').get(function () {
   return (
-    this.name.firstName +
+    this.name?.firstName +
     ' ' +
-    this.name.middleName +
+    this.name?.middleName +
     ' ' +
-    this.name.lastName +
+    this.name?.lastName +
     ''
   );
 });
-
 
 // handling update operation when result is null
 // studentSchema.pre('findOneAndUpdate', async function (next) {
@@ -135,7 +134,6 @@ studentSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
-
 
 // creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {

@@ -6,12 +6,12 @@ import httpStatus from 'http-status';
 import { TStudent } from './student.interface';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  console.log('base query', query);
-
   const queryObj = { ...query };
 
   const studentSearchableFields = ['email', 'name.firstName', 'presentAddress'];
+
   let searchTerm = '';
+
   if (query?.searchTerm) {
     searchTerm = query?.searchTerm as string;
   }
@@ -23,11 +23,13 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   });
 
   //filtering
-  const excludedFields = ['searchTerm', 'sort', 'limit'];
+  const excludedFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
   excludedFields.forEach((ele) => delete queryObj[ele]);
 
-  const filterQuery = await searchQuery
+  console.log({ query }, { queryObj });
+
+  const filterQuery = searchQuery
     .find(queryObj)
     .populate('admissionSemester')
     .populate({
@@ -45,15 +47,37 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     sort = query.sort as string;
   }
 
-  const sortQuery = await filterQuery.sort(sort);
+  const sortQuery = filterQuery.sort(sort);
 
+  let page = 1;
   let limit = 1;
-  if (query.limit) {
-    limit = query.limit;
-  }
-  const limitQuery = await sortQuery.limit(limit);
+  let skip = 0;
 
-  return limitQuery;
+  if (query.limit) {
+    limit = Number(query.limit);
+  }
+
+  if (query.page) {
+    page = Number(query.page);
+    skip = (page - 1) * limit;
+  }
+
+  const paginateQuery = sortQuery.skip(skip);
+
+  const limitQuery = paginateQuery.limit(limit);
+
+  let fields = '-__v';
+
+  //fields: 'name,email';
+  //fields: 'name email';
+
+  if (query.fields) {
+    fields = (query.fields as string).split(',').join(' ');
+    console.log({ fields });
+  }
+  const fieldQuery = await limitQuery.select(fields);
+
+  return fieldQuery;
 };
 
 // mongoose-এর, ObjectId -এরক্ষেত্রে findById, আর নরমাল custom made id এর ক্ষেত্রে findOne হবে।
