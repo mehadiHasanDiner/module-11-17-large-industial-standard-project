@@ -4,8 +4,8 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import httpStatus from 'http-status';
 import { TStudent } from './student.interface';
-import QueryBuilder from '../../builder/Querybuilder';
 import { studentSearchableFields } from './student.constant';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   // const queryObj = { ...query };
@@ -104,7 +104,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
 // mongoose-এর, ObjectId -এরক্ষেত্রে findById, আর নরমাল custom made id এর ক্ষেত্রে findOne হবে।
 const getSingleStudentsFromDB = async (id: string) => {
-  const result = await Student.findOne({ id })
+  const result = await Student.findById( id )
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -152,7 +152,7 @@ const updateStudentsIntoDB = async (id: string, payload: Partial<TStudent>) => {
   }
   console.log(modifiedUpdatedData);
 
-  const result = await Student.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Student.findByIdAndUpdate( id , modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
@@ -165,16 +165,18 @@ const deleteStudentsFromDB = async (id: string) => {
 
   try {
     session.startTransaction();
-    const deletedStudent = await Student.findOneAndUpdate(
-      { id },
+    const deletedStudent = await Student.findByIdAndUpdate(
+       id ,
       { isDeleted: true },
       { new: true, session },
     );
     if (!deletedStudent) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
     }
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    // get user_id from deletedStudent
+    const userId=deletedStudent.user;
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     );
