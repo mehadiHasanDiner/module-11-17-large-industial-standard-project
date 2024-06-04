@@ -4,80 +4,102 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import httpStatus from 'http-status';
 import { TStudent } from './student.interface';
+import QueryBuilder from '../../builder/Querybuilder';
+import { studentSearchableFields } from './student.constant';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  const queryObj = { ...query };
+  // const queryObj = { ...query };
 
-  const studentSearchableFields = ['email', 'name.firstName', 'presentAddress'];
+  // const studentSearchableFields = ['email', 'name.firstName', 'presentAddress'];
 
-  let searchTerm = '';
+  // let searchTerm = '';
 
-  if (query?.searchTerm) {
-    searchTerm = query?.searchTerm as string;
-  }
+  // if (query?.searchTerm) {
+  //   searchTerm = query?.searchTerm as string;
+  // }
 
-  const searchQuery = Student.find({
-    $or: studentSearchableFields.map((field) => ({
-      [field]: { $regex: searchTerm, $options: 'i' },
-    })),
-  });
+  // const searchQuery = Student.find({
+  //   $or: studentSearchableFields.map((field) => ({
+  //     [field]: { $regex: searchTerm, $options: 'i' },
+  //   })),
+  // });
 
-  //filtering
-  const excludedFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+  // //filtering
+  // const excludedFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
-  excludedFields.forEach((ele) => delete queryObj[ele]);
+  // excludedFields.forEach((ele) => delete queryObj[ele]);
 
-  console.log({ query }, { queryObj });
+  // console.log({ query }, { queryObj });
 
-  const filterQuery = searchQuery
-    .find(queryObj)
-    .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
+  // const filterQuery = searchQuery
+  //   .find(queryObj)
+  //   .populate('admissionSemester')
+  //   .populate({
+  //     path: 'academicDepartment',
+  //     populate: {
+  //       path: 'academicFaculty',
+  //     },
+  //   });
 
   //sorting function
 
-  let sort = '-createdAt';
+  //   let sort = '-createdAt';
 
-  if (query.sort) {
-    sort = query.sort as string;
-  }
+  //   if (query.sort) {
+  //     sort = query.sort as string;
+  //   }
 
-  const sortQuery = filterQuery.sort(sort);
+  //   const sortQuery = filterQuery.sort(sort);
 
-  let page = 1;
-  let limit = 1;
-  let skip = 0;
+  //   let page = 1;
+  //   let limit = 1;
+  //   let skip = 0;
 
-  if (query.limit) {
-    limit = Number(query.limit);
-  }
+  //   if (query.limit) {
+  //     limit = Number(query.limit);
+  //   }
 
-  if (query.page) {
-    page = Number(query.page);
-    skip = (page - 1) * limit;
-  }
+  //   if (query.page) {
+  //     page = Number(query.page);
+  //     skip = (page - 1) * limit;
+  //   }
 
-  const paginateQuery = sortQuery.skip(skip);
+  //   const paginateQuery = sortQuery.skip(skip);
 
-  const limitQuery = paginateQuery.limit(limit);
+  //   const limitQuery = paginateQuery.limit(limit);
 
-  let fields = '-__v';
+  //   let fields = '-__v';
 
-  //fields: 'name,email';
-  //fields: 'name email';
+  //   //fields: 'name,email';
+  //   //fields: 'name email';
 
-  if (query.fields) {
-    fields = (query.fields as string).split(',').join(' ');
-    console.log({ fields });
-  }
-  const fieldQuery = await limitQuery.select(fields);
+  //   if (query.fields) {
+  //     fields = (query.fields as string).split(',').join(' ');
+  //     console.log({ fields });
+  //   }
+  //   const fieldQuery = await limitQuery.select(fields);
 
-  return fieldQuery;
+  //   return fieldQuery;
+
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate('admissionSemester')
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      }),
+    query,
+  )
+    .search(studentSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await studentQuery.modelQuery;
+  return result;
 };
 
 // mongoose-এর, ObjectId -এরক্ষেত্রে findById, আর নরমাল custom made id এর ক্ষেত্রে findOne হবে।
