@@ -14,7 +14,7 @@ router.post(
 router.get('/:id', CourseControllers.getSingleCourse);
 
 router.patch(
-  '/:facultyId',
+  '/:id',
   validateRequest(CourseValidations.updateCourseValidationSchema),
   CourseControllers.updateCourse,
 );
