@@ -13,13 +13,11 @@ router.post(
 
 router.get('/:id', CourseControllers.getSingleCourse);
 
-// router.patch(
-//   '/:facultyId',
-//   validateRequest(
-//     AcademicFacultyValidations.updateAcademicFacultyValidationSchema,
-//   ),
-//   AcademicFacultyControllers.updateAcademicFaculty,
-// );
+router.patch(
+  '/:facultyId',
+  validateRequest(CourseValidations.updateCourseValidationSchema),
+  CourseControllers.updateCourse,
+);
 
 router.delete('/:id', CourseControllers.deleteCourse);
 
