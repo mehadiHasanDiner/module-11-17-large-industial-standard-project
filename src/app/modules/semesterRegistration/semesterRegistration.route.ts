@@ -20,6 +20,9 @@ router.get(
 
 router.patch(
   '/:id',
+  validateRequest(
+    SemesterRegistrationValidations.updateSemesterRegistrationValidationSchema,
+  ),
   SemesterRegistrationController.updateSemesterRegistration,
 );
 
@@ -28,10 +31,10 @@ router.get(
   SemesterRegistrationController.getSingleSemesterRegistration,
 );
 
-router.delete(
-  '/:id',
-  SemesterRegistrationController.deleteSemesterRegistration,
-);
+// router.delete(
+//   '/:id',
+//   SemesterRegistrationController.deleteSemesterRegistration,
+// );
 
 router.get('/', SemesterRegistrationController.getAllSemesterRegistrations);
 
