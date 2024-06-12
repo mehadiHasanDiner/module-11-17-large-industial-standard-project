@@ -151,58 +151,50 @@ const updateOfferedCourseIntoDB = async (
   id: string,
   payload: Pick<TOfferedCourse, 'faculty' | 'days' | 'startTime' | 'endTime'>,
 ) => {
-  /**
-   * Step 1: check if the offered course exists
-   * Step 2: check if the faculty exists
-   * Step 3: check if the semester registration status is upcoming
-   * Step 4: check if the faculty is available at that time. If not then throw error
-   * Step 5: update the offered course
-   */
   const { faculty, days, startTime, endTime } = payload;
 
   const isOfferedCourseExists = await OfferedCourse.findById(id);
 
   if (!isOfferedCourseExists) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found !');
+    throw new AppError(httpStatus.NOT_FOUND, 'Offered Courser is not found !');
   }
 
+  
   const isFacultyExists = await Faculty.findById(faculty);
-
+  
   if (!isFacultyExists) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found !');
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty is not found !');
   }
-
+  
   const semesterRegistration = isOfferedCourseExists.semesterRegistration;
-  // get the schedules of the faculties
+  
+  const  semesterRegistrationStatus = await SemesterRegistration.findById(semesterRegistration)
 
-  // Checking the status of the semester registration
-  const semesterRegistrationStatus =
-    await SemesterRegistration.findById(semesterRegistration);
-
-  if (semesterRegistrationStatus?.status !== 'UPCOMING') {
+  if (semesterRegistrationStatus.status!== "UPCOMING"){
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `You can not update this offered course as it is ${semesterRegistrationStatus?.status}`,
+      `You can not update this offered course as it is ${semesterRegistrationStatus.status}`,
     );
-  }
 
-  // check if the faculty is available at that time.
-  const assignedSchedules = await OfferedCourse.find({
-    semesterRegistration,
-    faculty,
-    days: { $in: days },
-  }).select('days startTime endTime');
+  }
+    // get the schedules of the faculties
+    const assignedSchedules = await OfferedCourse.find({
+      semesterRegistration,
+      faculty,
+      days: { $in: days },
+    }).select('days startTime endTime');
+
+  console.log(assignedSchedules);
 
   const newSchedule = {
     days,
     startTime,
     endTime,
   };
-
   if (hasTimeConflict(assignedSchedules, newSchedule)) {
     throw new AppError(
       httpStatus.CONFLICT,
-      `This faculty is not available at that time ! Choose other time or day`,
+      `This faculty is not available at that time ! chose other time or day`,
     );
   }
 
