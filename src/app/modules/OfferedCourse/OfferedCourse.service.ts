@@ -159,30 +159,29 @@ const updateOfferedCourseIntoDB = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Offered Courser is not found !');
   }
 
-  
   const isFacultyExists = await Faculty.findById(faculty);
-  
+
   if (!isFacultyExists) {
     throw new AppError(httpStatus.NOT_FOUND, 'Faculty is not found !');
   }
-  
-  const semesterRegistration = isOfferedCourseExists.semesterRegistration;
-  
-  const  semesterRegistrationStatus = await SemesterRegistration.findById(semesterRegistration)
 
-  if (semesterRegistrationStatus.status!== "UPCOMING"){
+  const semesterRegistration = isOfferedCourseExists.semesterRegistration;
+
+  const semesterRegistrationStatus =
+    await SemesterRegistration.findById(semesterRegistration);
+
+  if (semesterRegistrationStatus.status !== 'UPCOMING') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       `You can not update this offered course as it is ${semesterRegistrationStatus.status}`,
     );
-
   }
-    // get the schedules of the faculties
-    const assignedSchedules = await OfferedCourse.find({
-      semesterRegistration,
-      faculty,
-      days: { $in: days },
-    }).select('days startTime endTime');
+  // get the schedules of the faculties
+  const assignedSchedules = await OfferedCourse.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
 
   console.log(assignedSchedules);
 
