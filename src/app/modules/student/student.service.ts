@@ -83,6 +83,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
   const studentQuery = new QueryBuilder(
     Student.find()
+      .populate('user')
       .populate('admissionSemester')
       .populate({
         path: 'academicDepartment',
@@ -104,7 +105,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
 // mongoose-এর, ObjectId -এরক্ষেত্রে findById, আর নরমাল custom made id এর ক্ষেত্রে findOne হবে।
 const getSingleStudentsFromDB = async (id: string) => {
-  const result = await Student.findById( id )
+  const result = await Student.findById(id)
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -152,7 +153,7 @@ const updateStudentsIntoDB = async (id: string, payload: Partial<TStudent>) => {
   }
   console.log(modifiedUpdatedData);
 
-  const result = await Student.findByIdAndUpdate( id , modifiedUpdatedData, {
+  const result = await Student.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
@@ -166,7 +167,7 @@ const deleteStudentsFromDB = async (id: string) => {
   try {
     session.startTransaction();
     const deletedStudent = await Student.findByIdAndUpdate(
-       id ,
+      id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -174,7 +175,7 @@ const deleteStudentsFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
     }
     // get user_id from deletedStudent
-    const userId=deletedStudent.user;
+    const userId = deletedStudent.user;
     const deletedUser = await User.findByIdAndUpdate(
       userId,
       { isDeleted: true },
